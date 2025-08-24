@@ -1,85 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Renewable Energy 2022 Quiz</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f0fdf4; margin: 0; padding: 20px; }
-    .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    h1 { text-align: center; }
-    .question { font-weight: bold; margin-bottom: 10px; }
-    .options label { display: block; padding: 8px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 6px; cursor: pointer; }
-    .options input { margin-right: 8px; }
-    .navigation { margin-top: 15px; display: flex; justify-content: space-between; }
-    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-primary { background: #059669; color: white; }
-    .btn-secondary { background: #e5e7eb; }
-    .hidden { display: none; }
-    .correct { background: #d1fae5; border: 1px solid #10b981; }
-    .wrong { background: #fee2e2; border: 1px solid #ef4444; }
-    .result { margin-top: 20px; padding: 10px; border-radius: 8px; background: #f9fafb; }
-  </style>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Renewable Energy & Green Technology Quiz</title>
+   <style>
+       :root {
+           --primary-color: #2e7d32;
+           --secondary-color: #e8f5e9;
+           --accent-color: #ff9800;
+           --correct-color: #4caf50;
+           --incorrect-color: #f44336;
+           --light-gray: #f4f4f4;
+           --dark-gray: #333;
+           --border-radius: 8px;
+       }
+
+       body {
+           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+           line-height: 1.6;
+           margin: 0;
+           padding: 0;
+           background-color: var(--light-gray);
+           color: var(--dark-gray);
+           display: flex;
+           flex-direction: column;
+           min-height: 100vh;
+       }
+
+       .container {
+           width: 90%;
+           max-width: 800px;
+           margin: 20px auto;
+           padding: 20px;
+           background: #fff;
+           border-radius: var(--border-radius);
+           box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+       }
+
+       header {
+           text-align: center;
+           border-bottom: 2px solid var(--primary-color);
+           padding-bottom: 15px;
+           margin-bottom: 20px;
+       }
+
+       header h1 {
+           color: var(--primary-color);
+           margin: 0;
+       }
+
+       #language-selection, #results-summary {
+           text-align: center;
+           padding: 30px 0;
+       }
+
+       .lang-btn, .btn {
+           background-color: var(--primary-color);
+           color: #fff;
+           border: none;
+           padding: 15px 30px;
+           font-size: 1.2em;
+           border-radius: var(--border-radius);
+           cursor: pointer;
+           margin: 10px;
+           transition: background-color 0.3s, transform 0.2s;
+       }
+
+       .lang-btn:hover, .btn:hover {
+           background-color: #1b5e20;
+           transform: translateY(-2px);
+       }
+
+       #quiz-container {
+           display: none;
+       }
+
+       .question-block {
+           background-color: var(--secondary-color);
+           padding: 20px;
+           margin-bottom: 20px;
+           border-left: 5px solid var(--primary-color);
+           border-radius: 0 var(--border-radius) var(--border-radius) 0;
+       }
+
+       .question-block p {
+           font-weight: bold;
+           font-size: 1.1em;
+           margin-top: 0;
+       }
+
+       .question-block .options {
+           display: flex;
+           flex-direction: column;
+       }
+       
+       .question-block label {
+           display: block;
+           padding: 10px 15px;
+           margin: 5px 0;
+           border-radius: 5px;
+           cursor: pointer;
+           transition: background-color 0.3s;
+           border: 1px solid #ddd;
+       }
+       
+       .question-block label:hover {
+           background-color: #dceddc;
+       }
+
+       .question-block input[type="radio"] {
+           margin-right: 10px;
+       }
+
+       /* Result Styles */
+       .question-block.answered label.correct {
+           background-color: #dff0d8;
+           border-color: var(--correct-color);
+           color: #3c763d;
+           font-weight: bold;
+       }
+
+       .question-block.answered label.incorrect {
+           background-color: #f2dede;
+           border-color: var(--incorrect-color);
+           color: #a94442;
+           font-weight: bold;
+       }
+       
+       .question-block.answered input[type="radio"]:disabled + span {
+           color: #777;
+       }
+
+       #results-summary {
+           display: none;
+           background-color: var(--secondary-color);
+           border: 2px solid var(--primary-color);
+           padding: 20px;
+           border-radius: var(--border-radius);
+       }
+
+       #results-summary h2 {
+           color: var(--primary-color);
+       }
+
+       footer {
+           text-align: center;
+           padding: 20px;
+           margin-top: auto;
+           background: var(--dark-gray);
+           color: #fff;
+       }
+   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🌍 Renewable Energy 2022 Quiz</h1>
-    <div id="quiz"></div>
-    <div class="navigation">
-      <button id="prevBtn" class="btn btn-secondary">Previous</button>
-      <button id="nextBtn" class="btn btn-secondary">Next</button>
-      <button id="submitBtn" class="btn btn-primary">Submit</button>
-    </div>
-    <div id="result" class="result hidden"></div>
-  </div>
 
-  <script>
-    const QUESTIONS = [
-      {q: "Which type of pump is used in the wind mill?", options: ["Reciprocating", "Rotary type", "Diaphragm type", "All of the above"], correct: 3},
-      {q: "The minimum wind speed considered to be useful for working wind mills:", options: ["8 km/hr", "10 km/hr", "12 km/hr", "20 km/hr"], correct: 1},
-      {q: "In horizontal axis rotor wind mill, the blades used are:", options: ["Multiblade", "Sail type", "Propeller", "All of the above"], correct: 3},
-      // ... all remaining 57 questions (already structured in the React code)
-    ];
+   <div class="container">
+       <header>
+           <h1>Renewable Energy & Green Technology Quiz</h1>
+       </header>
 
-    let current = 0;
-    let answers = new Array(QUESTIONS.length).fill(null);
-    let submitted = false;
+       <div id="language-selection">
+           <h2>Select Language / भाषा चुनें</h2>
+           <button class="lang-btn" onclick="startQuiz('en')">English</button>
+           <button class="lang-btn" onclick="startQuiz('hi')">हिन्दी</button>
+       </div>
 
-    const quizDiv = document.getElementById("quiz");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const submitBtn = document.getElementById("submitBtn");
-    const resultDiv = document.getElementById("result");
+       <div id="results-summary">
+           <h2>Quiz Results</h2>
+           <p id="score-text"></p>
+       </div>
 
-    function renderQuestion() {
-      const q = QUESTIONS[current];
-      quizDiv.innerHTML = `
-        <div class="question">Q${current+1}. ${q.q}</div>
-        <div class="options">
-          ${q.options.map((opt, i) => `
-            <label class="${submitted ? (i===q.correct ? 'correct' : (answers[current]===i ? 'wrong' : '')) : ''}">
-              <input type="radio" name="q${current}" ${answers[current]===i ? 'checked' : ''} ${submitted ? 'disabled' : ''} onclick="selectAnswer(${i})">
-              ${String.fromCharCode(65+i)}. ${opt}
-            </label>
-          `).join("")}
-        </div>
-      `;
-      prevBtn.disabled = current===0;
-      nextBtn.disabled = current===QUESTIONS.length-1;
-    }
+       <div id="quiz-container">
+           <form id="quiz-form">
+               <!-- Questions will be dynamically inserted here -->
+           </form>
+           <div style="text-align: center; margin-top: 30px;">
+               <button type="button" class="btn" onclick="showResults()">Submit Quiz</button>
+           </div>
+       </div>
+   </div>
 
-    function selectAnswer(i) { answers[current] = i; }
+   <footer>
+       <p>© 2025 BSc Agriculture Hub</p>
+   </footer>
 
-    function showResult() {
-      let score = answers.reduce((acc,a,i)=>a===QUESTIONS[i].correct ? acc+1:acc,0);
-      resultDiv.classList.remove("hidden");
-      resultDiv.innerHTML = `<h2>Your Score: ${score}/${QUESTIONS.length} (${Math.round((score/QUESTIONS.length)*100)}%)</h2>`;
-    }
+   <script>
+       const quizData = [
+           { "q_en": "Which type of pump is used in the wind mill?", "q_hi": "पवन मिल में किस प्रकार के पम्प प्रयोग किया जाता है ?", "options_en": ["Reciprocating", "Rotary type", "Diaphragm type", "All of the above"], "options_hi": ["रेसीप्रोकेटिंग", "रोटरी टाइप", "डायफ्राम टाइप", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "The minimum wind speed considered to be useful for working wind mills for agricultural purpose:", "q_hi": "कृषि कार्यों हेतु पवन मिल को चलाने के लिए न्यूनतम वायु की चाल को लाभदायक मानते हैं :", "options_en": ["8 km/hr", "10 km/hr", "12 km/hr", "20 km/hr"], "options_hi": ["8 किमी/घण्टा", "10 किमी/घण्टा", "12 किमी/घण्टा", "20 किमी/घण्टा"], "answer": 1 },
+           { "q_en": "In horizontal axis rotor wind mill, the blades used are of:", "q_hi": "क्षैतिज धुरी वाले रोटर वाली पवन मिल में ब्लेड प्रयोग किये जाते हैं :", "options_en": ["Multiblade type rotor", "Sail type unit", "Propeller type unit", "All of the above"], "options_hi": ["बहुब्लेड टाइप रोटर", "सेल टाइप इकाई", "प्रोपेलर टाइप इकाई", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Which is the non-commercial energy source?", "q_hi": "गैर-व्यावसायिक ऊर्जा स्रोत है:", "options_en": ["Forests", "Animal waste", "Agriculture waste", "All of the above"], "options_hi": ["जंगल", "पशु वेस्ट", "कृषि वेस्ट", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Biogas plant consists of:", "q_hi": "गोबर गैस प्लान्ट के भाग होते हैं :", "options_en": ["Digester", "Gas holder", "Inlet and outlet pipes", "All of the above"], "options_hi": ["डाइजेस्टर", "गैस होल्डर", "इनलेट और आउटलेट पाइप", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Gas generation process in biogas plant includes:", "q_hi": "गोबर गैस प्लान्ट में गैस उत्पादन प्रक्रिया में शामिल है :", "options_en": ["Organic matter acted upon by bacteria and broken up into simple acids.", "These acids are acted upon by another bacteria which produce methane and CO2.", "Both (A) and (B)", "None of the above"], "options_hi": ["ऑर्गेनिक पदार्थ पर एक प्रकार के जीवाणु क्रिया कर इनको साधारण एसिड में बदल देते हैं", "इन एसिड्स में दूसरे प्रकार के जीवाणु क्रिया करते हैं जिससे मीथेन व कार्बन डाइऑक्साइड उत्पन्न होती है", "दोनों (A) और (B)", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "Which are exhaustible sources of energy?", "q_hi": "ऊर्जा के क्षयीय स्रोत्र कौन-से हैं?", "options_en": ["Metal", "Minerals", "Both (A) and (B)", "None of the above"], "options_hi": ["धातु", "खनिज", "दोनों (A) और (B)", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "Calves give dung per day about:", "q_hi": "बछड़े प्रति दिन लगभग गोबर देते हैं :", "options_en": ["3 kg", "5 kg", "6 kg", "7 kg"], "options_hi": ["3 किग्रा", "5 किग्रा", "6 किग्रा", "7 किग्रा"], "answer": 1 },
+           { "q_en": "The inexhaustible source of energy can be renewed by:", "q_hi": "गैर-क्षयीय ऊर्जा स्रोत को नवीनीकृत किया जा सकता है :", "options_en": ["Physical process", "Mechanical process", "Chemical process", "All of the above"], "options_hi": ["भौतिक प्रक्रिया द्वारा", "यांत्रिक प्रक्रिया द्वारा", "रासायनिक प्रक्रिया द्वारा", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "The process of gas production in biogas plant is retarded very much when temperature of slurry is below:", "q_hi": "गोबर गैस प्लान्ट में गैस उत्पादन प्रक्रिया बहुत अधिक धीमी पड़ जाती है जब स्लरी का तापमान से नीचे हो जाता है।", "options_en": ["20°C", "15°C", "25°C", "None of the above"], "options_hi": ["20°C", "15°C", "25°C", "उपर्युक्त में से कोई नहीं"], "answer": 1 },
+           { "q_en": "Biogas consists of:", "q_hi": "बायोगैस में पाई जाती है :", "options_en": ["Methane", "Carbon dioxide", "Both (A) and (B)", "None of the above"], "options_hi": ["मीथेन", "कार्बन डाइऑक्साइड", "दोनों (A) और (B)", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "Gas produced by biomass is called:", "q_hi": "बायोमास से उत्पन्न गैस को कहते हैं :", "options_en": ["Natural gas", "Nitrogen gas", "Biogas", "None of the above"], "options_hi": ["प्राकृतिक गैस", "नाइट्रोजन गैस", "बायोगैस", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "Electricity cannot be generated from which of the following?", "q_hi": "निम्नलिखित स्रोतों में किसके द्वारा विद्युत उत्पन्न नहीं की जा सकती ?", "options_en": ["Sun", "Ocean", "Moon", "Tidal"], "options_hi": ["सूर्य", "सागर", "चन्द्रमा", "टाइडल"], "answer": 2 },
+           { "q_en": "Which one is the conventional energy resource?", "q_hi": "निम्नलिखित में कौन-सा पारम्परिक ऊर्जा स्रोत है?", "options_en": ["Coal", "Petroleum", "Natural gas", "All of the above"], "options_hi": ["कोयला", "पेट्रोलियम", "प्राकृतिक गैस", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Photovoltaic system consists of:", "q_hi": "फोटोवोल्टाइक प्रणाली में शामिल होते हैं :", "options_en": ["PV module", "Mounting structure", "Battery and Inverter", "All of the above"], "options_hi": ["पी. वी. मॉड्यूल", "माउन्टिंग स्ट्रक्चर", "बैट्री और इनवर्टर", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Non-renewable energy sources are:", "q_hi": "गैर-नवीकरणीय ऊर्जा स्रोत होते हैं :", "options_en": ["Coal", "Petroleum", "Natural gas", "All of the above"], "options_hi": ["कोयला", "पेट्रोलियम", "प्राकृतिक गैस", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Precipitated solid matter that gravitates at digester bottom is called:", "q_hi": "बायोगैस प्लान्ट के डाइजेस्टर की तली में जमा होने वाले ठोस पदार्थ को कहते हैं :", "options_en": ["Scum", "Sludge", "Manure", "None of the above"], "options_hi": ["स्कम", "स्लज", "खाद", "उपर्युक्त में से कोई नहीं"], "answer": 1 },
+           { "q_en": "Which one is the commercial energy source?", "q_hi": "निम्नलिखित में से कौन-सा व्यावसायिक ऊर्जा स्रोत है ?", "options_en": ["Fossil fuel", "Hydroelectric power", "Nuclear power", "All of the above"], "options_hi": ["जीवाश्म ईंधन", "हाइड्रोइलेक्ट्रिक पॉवर", "परमाणु शक्ति", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Limitations of solar energy system may be:", "q_hi": "सोलर ऊर्जा प्रणाली की सीमायें हो सकती हैं :", "options_en": ["Initial cost is high", "Require storage battery for supply power during night", "Do not generate power during cloudy season", "All of the above"], "options_hi": ["प्रारम्भिक कीमत अधिक", "रात्रि में शक्ति देने के लिए स्टोरेज बैट्ररी की आवश्यकता", "बदली मौसम के बीच शक्ति उत्पन्न नहीं की जा सकती", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "The fixed dome type biogas plant is preferred as compared to movable drum type plant due to:", "q_hi": "स्थिर डोम प्रकार के बायोगैस प्लान्ट की अपेक्षा घूमने वाले ड्रम प्रकार के प्लान्ट को वरीयता देने का कारण है:", "options_en": ["No moving parts, no maintenance problem", "Longer working life", "Low cost and low operating cost", "All of the above"], "options_hi": ["घूमने वाले भाग न होने से रखरखाव की समस्या नहीं होती है", "लम्बी अवधि तक कार्य करता है", "प्लान्ट की कीमत कम व संचालन व्यय भी कम", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Horizontal and vertical axis rotors are the types of:", "q_hi": "क्षैतिज और ऊर्ध्वाधर धुरी रोटर्स के प्रकार हैं।", "options_en": ["Nuclear reactor", "Wind mill", "Biogas reactor", "Solar cell"], "options_hi": ["परमाणु रिएक्टर", "विन्ड मिल", "बायोगैस रिएक्टर", "सोलर सेल"], "answer": 1 },
+           { "q_en": "Which among the following is not a renewable source of energy?", "q_hi": "निम्नलिखित में कौन-सा नवीकरणीय ऊर्जा का स्रोत नहीं है ?", "options_en": ["Solar energy", "Biomass energy", "Hydropower", "Geothermal energy"], "options_hi": ["सौर्य ऊर्जा", "बायोमास ऊर्जा", "हाइड्रोपावर", "जियोथर्मल ऊर्जा"], "answer": 2 },
+           { "q_en": "Identify the non-renewable source of energy:", "q_hi": "निम्नलिखित में से गैर-नवीकरण ऊर्जा का स्रोत नहीं है ?", "options_en": ["Coal", "Fuel cell", "Wind power", "Water power"], "options_hi": ["कोयला", "फ्यूल सेल", "विन्ड पावर", "वाटर पावर"], "answer": 0 },
+           { "q_en": "Which of the following is a disadvantage of most of the renewable energy sources?", "q_hi": "अधिकतर नवीकरणीय ऊर्जा स्रोतों से निम्नलिखित में से कौन-सी हानि है ?", "options_en": ["High waste disposal cost", "Unreliable supply", "High running cost", "All of the above"], "options_hi": ["उच्च अपशिष्ट निपटान लागत", "अविश्वसनीय आपूर्ति", "उच्चतम चलने की लागत", "उपर्युक्त सभी"], "answer": 1 },
+           { "q_en": "When dead animals and plants are rotten in absence of air these produce a gas, called:", "q_hi": "जब मृत पशुओं और पौधों को वायु की अनुपस्थिति में सड़ाया जाता है तो इसने उत्पन्न होने वाली गैस को कहते हैं :", "options_en": ["Oxygen", "Carbon dioxide", "Natural gas", "Methane"], "options_hi": ["ऑक्सीजन", "कार्बन डाइऑक्साइड", "प्राकृतिक गैस", "मीथेन"], "answer": 3 },
+           { "q_en": "Black painted panels which are hanged at roof to trap heat and energy from sun are:", "q_hi": "काले रंग से पुते पैनलों को छत से लटकाकर उनसे सूर्य से ताप और ऊर्जा प्राप्त की जाती है, ये कहलाते हैं :", "options_en": ["Solar Cells", "Solar Heater", "Solar Furnace", "Solar Battery"], "options_hi": ["सौर्य सेल", "सौर्य हीटर", "सौर्य भट्टी", "सौर्य बैटरी"], "answer": 1 },
+           { "q_en": "Living things are sources of:", "q_hi": "जीवित वस्तुयें के स्रोत हैं।", "options_en": ["Fossil Fuel", "Biomass", "Coal", "None of the above"], "options_hi": ["जीवाश्म ईंधन", "बायोमास", "कोयला", "उपर्युक्त में से कोई नहीं"], "answer": 1 },
+           { "q_en": "Coal, crude oil, petroleum and natural gas are examples of:", "q_hi": "कोयला, क्रूड ऑयल, पेट्रोलियम और प्राकृतिक गैस उदाहरण हैं :", "options_en": ["Elements", "Fossil fuels", "Man-made fuels", "Compounds"], "options_hi": ["तत्वों के", "जीवाश्म ईंधन के", "मानव निर्मित ईंधन के", "यौगिकों के"], "answer": 1 },
+           { "q_en": "Plant material and waste from living things are regenerated as:", "q_hi": "पौधों से प्राप्त पदार्थ और जीवित वस्तुओं के व्यर्थ पदार्थों को पुनः निम्न के रूप में उत्पन्न करते हैं :", "options_en": ["Fossil fuel", "Biomass", "Coal", "Crude oil"], "options_hi": ["जीवाश्म ईंधन", "बायोमास", "कोयला", "क्रूड ऑयल"], "answer": 1 },
+           { "q_en": "Fossil fuels like coal, petroleum, natural gas are important sources of energy for:", "q_hi": "जीवाश्म ईंधन जैसे कोयला, पेट्रोलियम, प्राकृतिक गैस निम्न के लिए महत्वपूर्ण ऊर्जा के स्रोत हैं :", "options_en": ["Transport", "Homes", "Industries", "All of the above"], "options_hi": ["यातायात के लिए", "घरों के लिए", "उद्योगों के लिए", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Which of the following liquids has highest viscosity?", "q_hi": "निम्नलिखित द्रव में से किसकी विस्कोसिटी अधिकतम होती है?", "options_en": ["Petroleum", "Diesel", "Biodiesel", "Ethanol"], "options_hi": ["पेट्रोलियम", "डीजल", "बायोडीजल", "इथेनॉल"], "answer": 2 },
+           { "q_en": "A fuel cell in order to produce electricity burns:", "q_hi": "फ्यूल सेल से विद्युत उत्पन्न करने के लिए जलता है :", "options_en": ["Helium", "Nitrogen", "Hydrogen", "None of the above"], "options_hi": ["हीलियम", "नाइट्रोजन", "हाइड्रोजन", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "The efficiency of solar cell in converting incidental solar energy into electrical energy depends on:", "q_hi": "सौर्य ऊर्जा को विद्युत ऊर्जा में बदलना निर्भर करता है :", "options_en": ["The illumination", "Spectrum incident", "Material of construction", "All of the above"], "options_hi": ["प्रकाश पर", "स्पेक्ट्रम इन्सीडेन्ट पर", "बनाने में प्रयुक्त पदार्थ पर", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "The process of digestion and gasification is at highest rate when slurry temperature is:", "q_hi": "बायोगैस प्लान्ट में पदार्थ के सहने व गैस उत्पन्न होने की दर अधिकतम होती है जब स्लरी का तापमान होता है।", "options_en": ["35-38°C", "40-45°C", "25-28°C", "30-32°C"], "options_hi": ["35-38°C", "40-45°C", "25-28°C", "30-32°C"], "answer": 0 },
+           { "q_en": "Factors affecting generation of biogas in a biogas plants are:", "q_hi": "बायोगैस प्लान्ट में बायोगैस उत्पादन को प्रभावित करने वाले कारक होते हैं :", "options_en": ["Temperature of material", "Loading rate", "pH value", "All of the above"], "options_hi": ["प्लान्ट में उपस्थित पदार्थ का ताप", "प्लान्ट में गोबर, पानी के मिश्रण के डालने की दर", "पी-एच. मान", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "The process that is used for biomass conversion to energy or biofuels may be:", "q_hi": "बायोमास को ऊर्जा या बायोफ्यूल में बदलने में प्रयुक्त प्रक्रिया हो सकती है :", "options_en": ["Direct combustion", "Thermochemical conversion", "Biochemical conversion", "All of the above"], "options_hi": ["सीधा दहन", "तापीय रसायन प्रक्रिया", "जीवरसायन प्रक्रिया", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Instrument used for measuring solar radiation is:", "q_hi": "सौर्य विकिरण नापने में प्रयुक्त उपकरण है :", "options_en": ["Pyranometer", "SPV cell", "Hydrometer", "Thermometer"], "options_hi": ["पाइरेनोमीटर", "एस. पी. वी. सेल", "हाइड्रोमीटर", "थर्मोमीटर"], "answer": 0 },
+           { "q_en": "Average amount of dung produced by a cow is:", "q_hi": "एक गाय द्वारा प्रतिदिन उत्पन्न गोबर की औसत मात्रा है:", "options_en": ["5-10 kg", "10-15 kg", "15-20 kg", "None of the above"], "options_hi": ["5-10 किग्रा", "10-15 किग्रा", "15-20 किग्रा", "उपर्युक्त में से कोई नहीं"], "answer": 1 },
+           { "q_en": "Material used in photovoltaic cell is:", "q_hi": "फोटोवोल्टाइक सेल बनाने में प्रयुक्त पदार्थ है :", "options_en": ["Si", "C", "Pb", "Fe"], "options_hi": ["सिलिकॉन", "कार्बन", "लैड", "लोहा"], "answer": 0 },
+           { "q_en": "Where is the world's largest solar power plant located?", "q_hi": "विश्व का सबसे बड़ा सोलर पावर प्लान्ट स्थित है :", "options_en": ["India", "Germany", "USA", "China"], "options_hi": ["भारत", "जर्मनी", "यू. एस. ए.", "चीन"], "answer": 3 },
+           { "q_en": "Gas chromatograph is an instrument used for measurement of:", "q_hi": "गैस क्रोमेटोग्राफ एक उपकरण है जो कि नापने के लिए प्रयोग किया जाता है।", "options_en": ["Solar intensity", "Wind speed", "Composition of gas", "Depth of ocean"], "options_hi": ["सोलर तीव्रता", "हवा की चाल", "गैस का संयोजन", "समुद्र की गहराई"], "answer": 2 },
+           { "q_en": "The device that uses solar radiation to remove moisture from a substance is known as:", "q_hi": "किसी पदार्थ से नमी अलग करने के लिए सौर्य विकिरण में प्रयुक्त युक्त्ति है :", "options_en": ["Solar water heater", "Solar collector", "Solar dryer", "Photovoltaic cell"], "options_hi": ["सोलर वाटर हीटर", "सोलर कलेक्टर", "सोलर ड्रायर", "फोटोवोल्टाइक सेल"], "answer": 2 },
+           { "q_en": "Photovoltaic energy is conversion of sunlight into:", "q_hi": "सूर्य प्रकाश का निम्न में बदलना ही फोटोवोल्टाइक ऊर्जा है :", "options_en": ["Electricity", "Chemical energy", "Geothermal energy", "Bioenergy"], "options_hi": ["विद्युत ऊर्जा", "रासायनिक ऊर्जा", "भूतापीय ऊर्जा", "जैवऊर्जा"], "answer": 0 },
+           { "q_en": "Renewable source of energy used in India is:", "q_hi": "भारतवर्ष में ऊर्जा के नवीनीकरण स्रोत के रूप में प्रयोग होता है :", "options_en": ["Solar energy", "Wind energy", "Biomass energy", "All of the above"], "options_hi": ["सौर ऊर्जा", "पवन ऊर्जा", "बायोमास ऊर्जा", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Biogas is also known as:", "q_hi": "बायोगैस निम्न नामों से भी जानी जाती है :", "options_en": ["Swamp gas", "Sewer gas", "Fuel and Wet gas", "All of the above"], "options_hi": ["स्वैम्प गैस", "सीवर गैस", "फ्यूल तथा वेट गैस", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "The pH range of digester for optimum gas formation is:", "q_hi": "उचित मात्रा में गैस बनने के लिए डाइजेस्टर का पी-एच. मान होता है :", "options_en": ["2-3", "4-6", "6.5-7.5", "9-10"], "options_hi": ["2-3", "4-6", "6.5-7.5", "9-10"], "answer": 2 },
+           { "q_en": "Concentrated collector is used for high temperature range:", "q_hi": "सांद्रित कलेक्टर का प्रयोग उच्च तापमान प्राप्त करने में होता है :", "options_en": ["80-85°C", "90-95°C", "Above 100°C", "None of the above"], "options_hi": ["80-85°C", "90-95°C", "100°C से अधिक", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "The bacteria are died when the pH in the digester chamber is:", "q_hi": "बायोगैस प्लान्ट के डाइजेस्टर चैम्बर में उपस्थित जीवाणु मरने लगते हैं जब चैम्बर का पी-एच. मान होता है :", "options_en": ["Below 5", "6.5", "7", "Above 8"], "options_hi": ["5 से कम", "6.5", "7", "8 से अधिक"], "answer": 0 },
+           { "q_en": "The conversion efficiency obtained from silicon cells ranges:", "q_hi": "सिलिकॉन सेल में ऊर्जा बदलाव दक्षता होती है :", "options_en": ["10-15%", "20-25%", "8-10%", "None of the above"], "options_hi": ["10-15% के मध्य", "20-25% के मध्य", "8-10% के मध्य", "उपर्युक्त में से कोई नहीं"], "answer": 0 },
+           { "q_en": "The calorific value of thermal energy of biogas is about:", "q_hi": "बायोगैस की ताप ऊर्जा का कैलोरी मान लगभग होता है :", "options_en": ["4000 kcal/kg", "4200 kcal/kg", "4500 kcal/kg", "4700 kcal/m³"], "options_hi": ["4000 किलोकैलोरी / किग्रा.", "4200 किलोकैलोरी / किग्रा.", "4500 किलोकैलोरी / किग्रा.", "4700 किलोकैलोरी / मी³"], "answer": 3 },
+           { "q_en": "The source of energy to be obtained from sea is:", "q_hi": "समुद्र से प्राप्त होने वाली ऊर्जा का स्रोत है :", "options_en": ["Ocean waves", "Ocean tides", "Ocean currents", "All of the above"], "options_hi": ["समुद्री वेव्स", "समुद्री टाइड्स", "समुद्री धारायें", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Solar energy can be utilized for:", "q_hi": "सौर ऊर्जा का उपयोग निम्न के लिए हो सकता है :", "options_en": ["Water heating", "Refrigeration", "Distillation", "All of the above"], "options_hi": ["पानी गर्म करने में", "रेफ्रीजरेशन में", "आसवन में", "उपर्युक्त सभी में"], "answer": 3 },
+           { "q_en": "The production of biogas is reduced when element is present in higher concentration.", "q_hi": "बायोगैस का उत्पादन कम हो जाता है जब तत्व अधिक सघनता में पाया जाता है।", "options_en": ["Calcium", "Magnesium", "Potassium", "All of the above"], "options_hi": ["कैल्शियम", "मैग्नीशियम", "पौटेशियम", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Liquid, manure that flows out through biogas plant outlet pipe is called:", "q_hi": "बायोगैस प्लान्ट में आउटलेट पाइप से बहने वाले द्रव, खाद को कहते हैं।", "options_en": ["Scum", "Sludge", "Slurry", "None of the above"], "options_hi": ["स्कम", "स्लज", "स्लरी", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "The waste material formed on the top of the liquid slurry in the digester of biogas plant is:", "q_hi": "बायोगैस प्लान्ट के डाइजेस्टर में उपस्थित द्रव स्लरी के ऊपर एकत्र वेस्ट पदार्थ को कहते हैं :", "options_en": ["Scum", "Sludge", "Manure", "None of the above"], "options_hi": ["स्कम", "स्लज", "खाद", "उपर्युक्त में से कोई नहीं"], "answer": 0 },
+           { "q_en": "Carriers of biofertilizers must have the following properties:", "q_hi": "जैवउर्वरकों के वाहकों में निम्नलिखित गुण होने चाहिए :", "options_en": ["Organic matter", "Good water holding capacity", "Favourable pH", "All of the above"], "options_hi": ["कार्बनिक पदार्थ", "अच्छी जल धारण क्षमता", "उचित पी. एच.", "उपर्युक्त सभी"], "answer": 3 },
+           { "q_en": "Solar photovoltaic systems are free from:", "q_hi": "सोलर फोटोवोल्टाइक प्रणाली स्वतंत्र होती है:", "options_en": ["Noise", "Pollution", "Both (A) and (B)", "None of the above"], "options_hi": ["ध्वनि से", "प्रदूषण से", "दोनों (A) और (B)", "उपर्युक्त में से कोई नहीं"], "answer": 2 },
+           { "q_en": "Fuel cells are:", "q_hi": "फ्यूल सेल होते हैं :", "options_en": ["Carbon cell", "Hydrogen cell", "Nuclear cell", "Chromium cell"], "options_hi": ["कार्बन सेल", "हाइड्रोजन सेल", "परमाणु सेल", "क्रोमियम सेल"], "answer": 1 },
+           { "q_en": "Fossil fuels are rich in carbon and:", "q_hi": "जीवाश्म ईंधन में कार्बन के अतिरिक्त प्रचुर मात्रा में पाया जाता है :", "options_en": ["Nitrogen", "Hydrogen", "Oxygen", "All of the above"], "options_hi": ["नाइट्रोजन", "हाइड्रोजन", "ऑक्सीजन", "उपर्युक्त सभी"], "answer": 1 },
+           { "q_en": "The wind mills are likely to be most successful along sea coast and hilly areas of:", "q_hi": "किन राज्यों के समुद्र तट के किनारे व पहाड़ी क्षेत्रों में प्रायः पवन मिल अधिक सफल हैं?", "options_en": ["Karnataka", "Gujarat", "Maharashtra", "All of the above"], "options_hi": ["कर्नाटक", "गुजरात", "महाराष्ट्र", "उपर्युक्त सभी"], "answer": 3 }
+       ];
 
-    prevBtn.onclick = ()=>{ if(current>0){current--; renderQuestion();} };
-    nextBtn.onclick = ()=>{ if(current<QUESTIONS.length-1){current++; renderQuestion();} };
-    submitBtn.onclick = ()=>{ submitted=true; renderQuestion(); showResult(); };
+       let currentLanguage = 'en';
 
-    renderQuestion();
-  </script>
+       function startQuiz(lang) {
+           currentLanguage = lang;
+           document.getElementById('language-selection').style.display = 'none';
+           document.getElementById('quiz-container').style.display = 'block';
+           displayQuestions();
+       }
+
+       function displayQuestions() {
+           const quizForm = document.getElementById('quiz-form');
+           quizForm.innerHTML = '';
+           quizData.forEach((q, index) => {
+               const questionBlock = document.createElement('div');
+               questionBlock.className = 'question-block';
+               questionBlock.id = `q-block-${index}`;
+
+               const questionText = document.createElement('p');
+               questionText.textContent = `${index + 1}. ${q['q_' + currentLanguage]}`;
+               questionBlock.appendChild(questionText);
+
+               const optionsDiv = document.createElement('div');
+               optionsDiv.className = 'options';
+
+               const options = q['options_' + currentLanguage];
+               options.forEach((option, i) => {
+                   const label = document.createElement('label');
+                   label.id = `q${index}-option${i}`;
+                   
+                   const radio = document.createElement('input');
+                   radio.type = 'radio';
+                   radio.name = `question${index}`;
+                   radio.value = i;
+
+                   const optionText = document.createElement('span');
+                   optionText.textContent = option;
+
+                   label.appendChild(radio);
+                   label.appendChild(optionText);
+                   optionsDiv.appendChild(label);
+               });
+
+               questionBlock.appendChild(optionsDiv);
+               quizForm.appendChild(questionBlock);
+           });
+       }
+
+       function showResults() {
+           let score = 0;
+           const form = document.getElementById('quiz-form');
+           const totalQuestions = quizData.length;
+
+           quizData.forEach((q, index) => {
+               const questionBlock = document.getElementById(`q-block-${index}`);
+               questionBlock.classList.add('answered');
+
+               const selectedOption = form.querySelector(`input[name="question${index}"]:checked`);
+               const labels = questionBlock.querySelectorAll('label');
+
+               if (selectedOption) {
+                   const userAnswer = parseInt(selectedOption.value);
+                   if (userAnswer === q.answer) {
+                       score++;
+                       labels[userAnswer].classList.add('correct');
+                   } else {
+                       labels[userAnswer].classList.add('incorrect');
+                       labels[q.answer].classList.add('correct');
+                   }
+               } else {
+                   // If no answer was selected, still highlight the correct one
+                   labels[q.answer].classList.add('correct');
+               }
+           });
+           
+           // Disable all radio buttons
+           form.querySelectorAll('input[type="radio"]').forEach(radio => {
+               radio.disabled = true;
+           });
+
+           const resultsSummary = document.getElementById('results-summary');
+           const scoreText = document.getElementById('score-text');
+           
+           let resultMessage = currentLanguage === 'en'
+               ? `You scored ${score} out of ${totalQuestions}.`
+               : `आपने ${totalQuestions} में से ${score} अंक प्राप्त किए।`;
+
+           scoreText.textContent = resultMessage;
+           resultsSummary.style.display = 'block';
+
+           // Scroll to the results summary
+           resultsSummary.scrollIntoView({ behavior: 'smooth' });
+       }
+   </script>
+
 </body>
 </html>
