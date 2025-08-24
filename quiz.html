@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSc Agriculture - Select a Quiz</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+        .container { width: 80%; margin: auto; overflow: hidden; padding: 0 20px; }
+        header { background: #2e7d32; color: #fff; padding-top: 30px; min-height: 70px; border-bottom: #004d00 3px solid; text-align: center; }
+        header h1 { margin: 0; font-size: 2.5em; }
+        nav { background: #333; color: #fff; padding: 10px 0; text-align: center; position: sticky; top: 0; z-index: 100; }
+        nav a { color: #fff; text-decoration: none; padding: 15px 25px; font-size: 1.2em; transition: background-color 0.3s; }
+        nav a:hover, nav a.active { background-color: #2e7d32; }
+        .content-section { padding: 30px 20px; margin: 20px 0; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .content-section h2 { color: #2e7d32; text-align: center; margin-bottom: 25px;}
+        
+        /* --- Search Bar Styling --- */
+        #search-bar {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box; /* Important for padding */
+            transition: border-color 0.3s;
+        }
+        #search-bar:focus {
+            border-color: #2e7d32;
+            outline: none;
+        }
+
+        .quiz-list { list-style: none; padding: 0; }
+        .quiz-list li { margin-bottom: 15px; }
+        .quiz-list a { display: block; background-color: #e8f5e9; color: #2e7d32; padding: 20px; text-decoration: none; border-radius: 5px; font-size: 1.2em; font-weight: bold; border-left: 5px solid #4caf50; transition: all 0.3s ease; }
+        .quiz-list a:hover { background-color: #4caf50; color: #fff; transform: translateX(10px); }
+        footer { text-align: center; padding: 20px; margin-top: 20px; background: #333; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>🌾 BSc Agriculture Hub 🌾</h1>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <a href="index.html">Home</a>
+            <a href="notes.html">Notes</a>
+            <a href="quiz.html" class="active">Quiz</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="content-section">
+            <h2>🧠Choose a Quiz</h2>
+            
+            <!-- Search Bar HTML -->
+            <input type="text" id="search-bar" placeholder="Search for a subject...">
+
+            <!-- The JavaScript will automatically add quiz links here -->
+            <ul id="quiz-list-container" class="quiz-list"></ul>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 BSc Agriculture Hub. All Rights Reserved.</p>
+    </footer>
+
+    <!-- ===== SCRIPT TO GENERATE AND FILTER THE QUIZ LIST ===== -->
+    <script>
+        // --- List of all subjects from the IV Semester syllabus ---
+        const quizzes = [
+            { file: 'crop-production-technology-2.html', title: 'Crop Production Technology – II (Rabi Crops)' },
+            { file: 'production-technology-vegetables-spices.html', title: 'Production Technology of Vegetables and Spices' },
+            { file: 'renewable-energy-green-technology.html', title: 'Renewable Energy and Green Technology' },
+            { file: 'environmental-studies-disaster-management.html', title: 'Environmental Studies and Disaster Management' },
+            { file: 'biotechnology.html', title: 'Paper-5: Biotechnology' },
+            { file: 'agricultural-marketing-trade-prices.html', title: 'Agricultural Marketing Trade and Prices' },
+            { file: 'rural-sociology-educational-psychology.html', title: 'Rural Sociology and Educational Psychology' },
+            { file: 'agricultural-microbiology.html', title: 'Agricultural Microbiology' },
+            { file: 'principles-food-science-nutrition.html', title: 'Principles of Food Science and Nutrition' },
+            { file: 'water-management-for-crops.html', title: 'Water Management for Crops' },
+            { file: 'diseases-of-crops-management-2.html', title: 'Diseases of Field & Horticultural Crops – II' },
+            { file: 'elective-high-tech-horticulture.html', title: 'High-tech horticulture' },
+            { file: 'elective-biopesticides-biofertilizers.html', title: 'Biopesticides and Biofertilizers' },
+            { file: 'elective-weed-management.html', title: 'Weed Management' },
+            { file: 'nss-ncc-physical-education.html', title: 'NSS/NCC/Physical Education' }
+        ];
+
+        const quizListContainer = document.getElementById('quiz-list-container');
+
+        // 1. GENERATE THE LIST
+        quizzes.forEach(quiz => {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = 'quiz/' + quiz.file; 
+            link.textContent = quiz.title;   
+            listItem.appendChild(link);
+            quizListContainer.appendChild(listItem);
+        });
+
+        // 2. SEARCH FUNCTIONALITY
+        const searchBar = document.getElementById('search-bar');
+        const listItems = quizListContainer.getElementsByTagName('li');
+
+        searchBar.addEventListener('keyup', function() {
+            const searchTerm = searchBar.value.toLowerCase();
+
+            for (let i = 0; i < listItems.length; i++) {
+                const item = listItems[i];
+                const itemText = item.textContent.toLowerCase();
+                
+                if (itemText.includes(searchTerm)) {
+                    item.style.display = ''; // Show the item
+                } else {
+                    item.style.display = 'none'; // Hide the item
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

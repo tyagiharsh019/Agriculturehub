@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renewable Energy Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple transition for elements */
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-teal-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="w-full max-w-3xl mx-auto">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="bg-white rounded-3xl shadow-lg p-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">🌍 Renewable Energy 2022 Quiz</h1>
+            <p class="text-gray-600 mt-3">Test your knowledge with 59 multiple-choice questions from the exam paper.</p>
+            <button id="start-btn" class="mt-8 px-8 py-3 rounded-xl shadow-md bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-all">
+                Start Quiz
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden bg-white rounded-3xl shadow-lg p-6 md:p-8 space-y-6">
+            <div class="space-y-2">
+                <div class="flex items-center justify-between text-sm text-gray-600 font-medium">
+                    <span id="question-counter">Question 1 of 59</span>
+                    <span id="answered-counter">Answered: 0/59</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800"></h2>
+            
+            <div id="options-container" class="grid gap-4">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+            
+            <div class="flex flex-wrap gap-4 justify-between items-center pt-4 border-t mt-6">
+                <div class="flex gap-4">
+                    <button id="prev-btn" class="px-6 py-2 rounded-lg border-2 font-semibold disabled:opacity-40 disabled:cursor-not-allowed">Previous</button>
+                    <button id="next-btn" class="px-6 py-2 rounded-lg border-2 font-semibold disabled:opacity-40 disabled:cursor-not-allowed">Next</button>
+                </div>
+                <button id="submit-btn" class="px-7 py-3 rounded-xl bg-emerald-600 text-white font-bold disabled:opacity-40 disabled:cursor-not-allowed">
+                    Submit Answers
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden bg-white rounded-3xl shadow-lg p-8 text-center space-y-5">
+           <h2 class="text-3xl font-bold">Quiz Complete!</h2>
+           <p class="text-xl text-gray-700">You scored:</p>
+           <p id="score-text" class="text-6xl font-bold text-emerald-600">0 / 59</p>
+           <p id="percentage-text" class="text-2xl font-semibold">0%</p>
+           <button id="reset-btn" class="mt-6 px-8 py-3 rounded-xl shadow-md bg-gray-700 text-white font-bold hover:bg-gray-800 transition-all">
+            Try Again
+          </button>
+        </div>
+
+    </div>
+
+    <script>
+        const QUESTIONS = [
+            { q: "Which type of pump is used in the wind mill?", options: ["Reciprocating", "Rotary type", "Diaphragm type", "All of the above"], correct: 3 },
+            { q: "The minimum wind speed considered to be useful for working wind mills for agricultural purpose:", options: ["8 km/hr", "10 km/hr", "12 km/hr", "20 km/hr"], correct: 1 },
+            { q: "In horizontal axis rotor wind mill, the blades used are of:", options: ["Multiblade type rotor", "Sail type unit", "Propeller type unit", "All of the above"], correct: 3 },
+            { q: "Which is the non-commercial energy source?", options: ["Forests", "Animal waste", "Agriculture waste", "All of the above"], correct: 3 },
+            { q: "Biogas plant consists of:", options: ["Digester", "Gas holder", "Inlet and outlet pipes", "All of the above"], correct: 3 },
+            { q: "Gas generation process in biogas plant includes:", options: ["Organic matter is broken into simple acids by bacteria", "Acids are acted upon by other bacteria to produce methane and CO₂", "Both (A) and (B)", "None of the above"], correct: 2 },
+            { q: "Which are exhaustible sources of energy?", options: ["Metal", "Minerals", "Both (A) and (B)", "None of the above"], correct: 2 },
+            { q: "Calves give dung per day about:", options: ["3 kg", "5 kg", "6 kg", "7 kg"], correct: 1 },
+            { q: "The inexhaustible source of energy can be renewed by:", options: ["Physical process", "Mechanical process", "Chemical process", "All of the above"], correct: 3 },
+            { q: "The process of gas production in biogas plant is retarded very much when temperature of slurry is below:", options: ["20°C", "15°C", "25°C", "None of the above"], correct: 1 },
+            { q: "Biogas consists of:", options: ["Methane", "Carbon dioxide", "Both (A) and (B)", "None of the above"], correct: 2 },
+            { q: "Gas produced by biomass is called:", options: ["Natural gas", "Nitrogen gas", "Biogas", "None of the above"], correct: 2 },
+            { q: "Electricity cannot be generated from which of the following?", options: ["Sun", "Ocean", "Moon", "Tidal"], correct: 2 },
+            { q: "Which one is the conventional energy resource?", options: ["Coal", "Petroleum", "Natural gas", "All of the above"], correct: 3 },
+            { q: "Photovoltaic system consists of:", options: ["PV module", "Mounting structure", "Battery and Inverter", "All of the above"], correct: 3 },
+            { q: "Non-renewable energy sources are:", options: ["Coal", "Petroleum", "Natural gas", "All of the above"], correct: 3 },
+            { q: "Precipitated solid matter that gravitates at digester bottom is called:", options: ["Scum", "Sludge", "Manure", "None of the above"], correct: 1 },
+            { q: "Which one is the commercial energy source?", options: ["Fossil fuel", "Hydroelectric power", "Nuclear power", "All of the above"], correct: 3 },
+            { q: "Limitations of solar energy system may be:", options: ["Initial cost is high", "Require storage battery for supply power during night", "Do not generate power during cloudy season", "All of the above"], correct: 3 },
+            { q: "The fixed dome type biogas plant is preferred as compared to movable drum type plant due to:", options: ["No moving parts, no maintenance problem", "Longer working life", "Low cost and low operating cost", "All of the above"], correct: 3 },
+            { q: "Horizontal and vertical axis rotors are the types of:", options: ["Nuclear reactor", "Wind mill", "Biogas reactor", "Solar cell"], correct: 1 },
+            { q: "Identify the non-renewable source of energy:", options: ["Coal", "Fuel cell", "Wind power", "Water power"], correct: 0 },
+            { q: "Which of the following is a disadvantage of most of the renewable energy sources?", options: ["High waste disposal cost", "Unreliable supply", "High running cost", "All of the above"], correct: 1 },
+            { q: "When dead animals and plants are rotton in absence of air these produce a gas, called:", options: ["Oxygen", "Carbon dioxide", "Natural gas", "Methane"], correct: 3 },
+            { q: "Black painted pannels which are hanged at roof to trap heat and energy from sun are:", options: ["Solar Cells", "Solar Heater", "Solar Furnace", "Solar Battery"], correct: 1 },
+            { q: "Living things are sources of:", options: ["Fossil Fuel", "Biomass", "Coal", "None of the above"], correct: 1 },
+            { q: "Coal, crude oil, petroleum and natural gas are examples of:", options: ["Elements", "Fossil fuels", "Man-made fuels", "Compounds"], correct: 1 },
+            { q: "Plant material and waste from living things are regenerated as:", options: ["Fossil fuel", "Biomass", "Coal", "Crude oil"], correct: 1 },
+            { q: "Fossil fuels like coal, petroleum, natural gas are important sources of energy for:", options: ["Transport", "Homes", "Industries", "All of the above"], correct: 3 },
+            { q: "Which of the following liquids has highest viscosity?", options: ["Petroleum", "Diesel", "Biodiesel", "Ethanol"], correct: 2 },
+            { q: "A fuel cell in order to produce electricity burns:", options: ["Helium", "Nitrogen", "Hydrogen", "None of the above"], correct: 2 },
+            { q: "The efficiency of solar cell in converting incidental solar energy into electrical energy depends on:", options: ["The illumination", "Spectrum incident", "Material of construction", "All of the above"], correct: 3 },
+            { q: "The process of digestion and gasification is at highest rate when slurry temperature is:", options: ["35-38°C", "40-45°C", "25-28°C", "30-32°C"], correct: 0 },
+            { q: "Factors affecting generation of biogas in a biogas plants are:", options: ["Temperature of material", "Loading rate", "pH value", "All of the above"], correct: 3 },
+            { q: "The process that is used for biomass conversion to energy or biofuels may be:", options: ["Direct combustion", "Thermochemical conversion", "Biochemical conversion", "All of the above"], correct: 3 },
+            { q: "Instrument used for measuring solar radiation is:", options: ["Pyranometer", "SPV cell", "Hydrometer", "Thermometer"], correct: 0 },
+            { q: "Average amount of dung produced by a cow is:", options: ["5-10 kg", "10-15 kg", "15-20 kg", "None of the above"], correct: 1 },
+            { q: "Material used in photovoltaic cell is:", options: ["Si", "C", "Pb", "Fe"], correct: 0 },
+            { q: "Where is the world's largest solar power plant located? (as of mid-2022)", options: ["India", "Germany", "USA", "China"], correct: 0 },
+            { q: "Gas chromatograph is an instrument used for measurement of:", options: ["Solar intensity", "Wind speed", "Composition of gas", "Depth of ocean"], correct: 2 },
+            { q: "The device that uses solar radiation to remove moisture from a substance is known as:", options: ["Solar water heater", "Solar collector", "Solar dryer", "Photovoltaic cell"], correct: 2 },
+            { q: "Photovoltaic energy is conversion of sunlight into:", options: ["Electricity", "Chemical energy", "Geothermal energy", "Bioenergy"], correct: 0 },
+            { q: "Renewable source of energy used in India is:", options: ["Solar energy", "Wind energy", "Biomass energy", "All of the above"], correct: 3 },
+            { q: "Biogas is also known as:", options: ["Swamp gas", "Sewer gas", "Fuel and Wet gas", "All of the above"], correct: 3 },
+            { q: "The pH range of digester for optimum gas formation is:", options: ["2-3", "4-6", "9-10", "None of the above"], correct: 3 },
+            { q: "Concentrated collector is used for high temperature range:", options: ["80-85°C", "90-95°C", "Above 100°C", "None of the above"], correct: 2 },
+            { q: "The bacteria are died when the pH in the digester chamber is:", options: ["5.6", "6.5", "7", "Above 8"], correct: 3 },
+            { q: "The conversion efficiency obtained from silicon cells ranges:", options: ["10-15%", "20-25%", "8-10%", "None of the above"], correct: 0 },
+            { q: "The calorific value of thermal energy of biogas is about:", options: ["4000 kcal/kg", "4200 kcal/kg", "4500 kcal/kg", "None of the above"], correct: 1 },
+            { q: "The source of energy to be obtained from sea is:", options: ["Ocean waves", "Ocean tides", "Ocean currents", "All of the above"], correct: 3 },
+            { q: "Solar energy can be utilized for:", options: ["Water heating", "Refrigeration", "Distillation", "All of the above"], correct: 3 },
+            { q: "The production of biogas is reduced when ___ element is present in higher concentration.", options: ["Calcium", "Magnesium", "Potassium", "All of the above"], correct: 3 },
+            { q: "Liquid, manure that flows out through biogas plant outlet pipe is called:", options: ["Scum", "Sludge", "Slurry", "None of the above"], correct: 2 },
+            { q: "The waste material formed on the top of the liquid slurry in the digester of biogas plant is:", options: ["Scum", "Sludge", "Manure", "None of the above"], correct: 0 },
+            { q: "Carriers of biofertilizers must have the following properties:", options: ["Organic matter", "Good water holding capacity", "Favourable pH", "All of the above"], correct: 3 },
+            { q: "Solar photovoltaic systems are free from:", options: ["Noise", "Pollution", "Both (A) and (B)", "None of the above"], correct: 2 },
+            { q: "Fuel cells are:", options: ["Carbon cell", "Hydrogen cell", "Nuclear cell", "Chromium cell"], correct: 1 },
+            { q: "Fossil fuels are rich in carbon and:", options: ["Nitrogen", "Hydrogen", "Oxygen", "All of the above"], correct: 1 },
+            { q: "The wind mills are likely to be most successful along sea coast and hilly areas of:", options: ["Karnataka", "Gujarat", "Maharashtra", "All of the above"], correct: 3 }
+        ];
+
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const startBtn = document.getElementById('start-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        const questionCounter = document.getElementById('question-counter');
+        const answeredCounter = document.getElementById('answered-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+
+        const scoreText = document.getElementById('score-text');
+        const percentageText = document.getElementById('percentage-text');
+
+        // --- State ---
+        let currentQuestionIndex = 0;
+        let userAnswers = Array(QUESTIONS.length).fill(null);
+        const letters = ["A", "B", "C", "D"];
+
+        // --- Functions ---
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function loadQuestion(index) {
+            const question = QUESTIONS[index];
+            questionText.textContent = question.q;
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, i) => {
+                const isChecked = userAnswers[index] === i;
+                const optionId = `q${index}-o${i}`;
+
+                const optionElement = document.createElement('label');
+                optionElement.className = `w-full flex items-start gap-4 p-4 rounded-lg border-2 transition-all cursor-pointer ${isChecked ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`;
+                optionElement.setAttribute('for', optionId);
+
+                optionElement.innerHTML = `
+                    <input type="radio" id="${optionId}" name="question${index}" class="mt-1" ${isChecked ? 'checked' : ''}>
+                    <div class="font-semibold">${letters[i]}. ${option}</div>
+                `;
+
+                optionElement.querySelector('input').addEventListener('change', () => {
+                    userAnswers[index] = i;
+                    updateUI();
+                    // Re-render the options to reflect the change in style
+                    loadQuestion(currentQuestionIndex);
+                });
+
+                optionsContainer.appendChild(optionElement);
+            });
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update counters
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${QUESTIONS.length}`;
+            const answeredCount = userAnswers.filter(a => a !== null).length;
+            answeredCounter.textContent = `Answered: ${answeredCount}/${QUESTIONS.length}`;
+
+            // Update progress bar
+            progressBar.style.width = `${((currentQuestionIndex + 1) / QUESTIONS.length) * 100}%`;
+
+            // Update navigation buttons
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === QUESTIONS.length - 1;
+
+            // Update submit button
+            submitBtn.disabled = answeredCount !== QUESTIONS.length;
+        }
+
+        function showNextQuestion() {
+            if (currentQuestionIndex < QUESTIONS.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            }
+        }
+
+        function showPrevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            }
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === QUESTIONS[index].correct) {
+                    score++;
+                }
+            });
+
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            scoreText.textContent = `${score} / ${QUESTIONS.length}`;
+            const percentage = Math.round((score / QUESTIONS.length) * 100);
+            percentageText.textContent = `${percentage}%`;
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', showNextQuestion);
+        prevBtn.addEventListener('click', showPrevQuestion);
+        submitBtn.addEventListener('click', submitQuiz);
+        resetBtn.addEventListener('click', resetQuiz);
+
+    </script>
+</body>
+</html>
