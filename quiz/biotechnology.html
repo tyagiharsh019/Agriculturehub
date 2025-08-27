@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Biotechnology Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        h1 { text-align: center; }
+        .question { margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 0 5px #ccc; }
+        .options { margin-top: 10px; }
+        .options label { display: block; margin-bottom: 8px; cursor: pointer; }
+        .submit-btn { display: block; margin: 30px auto; padding: 10px 25px; font-size: 18px; background-color: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .result { max-width: 600px; margin: 20px auto; padding: 15px; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 8px; }
+        .correct { color: green; font-weight: bold; }
+        .incorrect { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Biotechnology Quiz</h1>
+    <form id="quizForm">
+        <!-- Questions will be inserted here by JavaScript -->
+    </form>
+    <button type="button" class="submit-btn" onclick="checkAnswers()">Submit</button>
+    <div id="results" class="result" style="display:none;"></div>
+
+    <script>
+        const questions = [
+            "Which enzyme is used to cut DNA at specific sites?",
+            "What is a transgenic organism?",
+            "Which process is used to amplify DNA sequences?",
+            "Golden rice is an example of a genetically modified crop that is enriched with",
+            "What is the purpose of using biotechnology in agriculture?",
+            "Which of the following is used to initiate tissue culture?",
+            "What is somatic hybridization?",
+            "Which plant hormone is commonly used for rooting?",
+            "Which medium is most commonly used for plant tissue culture?",
+            "Which of the following is not a step in micro propagation?",
+            "Which chemical is commonly used to induce protoplast fusion?",
+            "The main purpose of embryo rescue is",
+            "Synthetic seeds are primarily made from which part of plant?",
+            "An example of a somatic hybrid-",
+            "Haploid plants can be obtained from-",
+            "eybrtds arc:",
+            "Cryopreservation is done at temperature",
+            "Which of the following is best suited method for production of virus free plants",
+            "Callus is defined as",
+            "Culturing of cells in liquid agitated medium is called:",
+            "What is the process of binding of primer to denatured strand called?",
+            "DNA segment to be cloned is called-",
+            "The term for direct formation of organs without an intermediate callus phase?",
+            "Which plant tissue is commonly used to induce somatic embryogenesis?",
+            "Who invented PCR technique?",
+            "The first transgenic plant to be produced is:",
+            "Which technique involves the use of a gene gun for gene transfer in plants?",
+            "The size of T-DNA is around -",
+            "Restriction enzymes are-",
+            "Who is considered as father of plant tissue culture?",
+            "The ability of a plant cell to regenerate into a whole plant is known as:",
+            "Taq polymerase enzyme is obtained from:",
+            "DNA fragments separated on an agarose gel can be visualized after staining with:",
+            "RAPD is a type of:",
+            "The introduction of DNA into cells by exposing to high voltage electric pulse is called",
+            "Agrobacterium tumefaciens is a-",
+            "Protoplasts can be isolated by giving enzymatic treatment in plant cells:",
+            "Synthetic seeds are:",
+            "Solidifying agent used in plant tissue culture is:",
+            "The term 'polymorphism' in molecular markers refers to:",
+            "A disadvantage of micropropagation is:",
+            "Which method is used for long-term storage of plant genetic material?",
+            "What is the role of ligase in genetic engineering?",
+            "Which of the following is not a method of gene transfer in plants?",
+            "The purpose of autoclaving in plant tissue culture is:",
+            "Microsatellite markers are also known as:",
+            "The Cartagena Protocol is primarily concerned with:",
+            "What is organ culture?",
+            "The introduction of foreign DNA into host organism is called:",
+            "In recombinant DNA technology, a plasmid is used as?",
+            "Embryo culture can be used to produce:",
+            "Which of the following chemicals can induce expression of vir genes in Agrobacterium?",
+            "What is the role of QTL in marker-assisted breeding?",
+            "The use of pollen culture can significantly contribute to which of the following in crop improvement?",
+            "Red biotechnology primarily focuses on:",
+            "Which tissue culture technique is most closely associated with the generation of somaclonal variation?",
+            "Which type of plants are typically transformed using Agrobacterium tumefaciens?",
+            "In India, which agency is responsible for approving genetically modified crops?",
+            "Which of the following markers is most commonly used to identify polymorphism at a single nucleotide position?",
+            "What is the usual temperature for the extension step in PCR?",
+            "Which of the following is a key characteristic of batch culture?",
+            "Which of the following is a key application of RFLP?",
+            "The most commonly used cryoprotectant in cryopreservation is:",
+            "Agrobacterium transfers a specific segment of DNA from its plasmid into the plant genome. This statement is called:",
+            "Somaclonal variation was utilized in the development of 'Pusa Jaikisan', a variety of which crop?",
+            "What is the role of Bt gene in transgenic crops?",
+            "The process of transferring micropropagated plants from a controlled environment to soil is called",
+            "In PCR, what is the purpose of denaturation step?",
+            "Which technique is used to separate proteins based on their size?",
+            "The role of a selectable marker in gene transfer is:",
+            "Which process is used to identify specific DNA sequences?",
+            "A plasmid vector typically includes:",
+            "Which biotechnology field is associated with agricultural improvements?",
+            "What does the term 'biosafety' refer to in biotechnology?",
+            "What is the role of cytokinin in plant tissue culture?"
+        ];
+
+        const options = [
+            ["Restriction enzyme", "DNA Polymerase", "Ligase", "Helicase"],
+            ["An organism with mutated genes", "An organism with genes from another species", "An organism with only one type of gene", "An organism without genes"],
+            ["PCR", "Gel electrophoresis", "DNA sequencing", "Cloning"],
+            ["Vitamin C", "Vitamin B", "Vitamin A", "Vitamin D"],
+            ["To increase crop yield", "To reduce the use of chemical fertilizers", "To enhance nutritional value of crops", "All of the above"],
+            ["Seed", "Soil", "Explant", "Fruit"],
+            ["Fusion of two different plant species", "Genetic modification of plants", "Cross-pollination of plants", "Production of hybrid seeds"],
+            ["Auxin", "Cytokinin", "Gibberellin", "Ethylene"],
+            ["Murashige and Skoog (MS) medium", "Agar medium", "Luria-Bertani (LB) medium", "Potato Dextrose Agar (PDA) medium"],
+            ["Explant selection", "Callus formation", "Seed germination", "Rooting and acclimatization"],
+            ["PEG (Polyethylene glycol)", "Ethanol", "Chloroform", "Methanol"],
+            ["To save weak embryos from aborting", "To enhance seed dormancy", "To induce somatic hybridization", "To increase flower of size"],
+            ["Apical buds", "Somatic embryos", "Root tips", "Leaf tissues"],
+            ["Pomato", "Carrot", "Wheat", "Banana"],
+            ["Bud culture", "Leaf culture", "Anther culture", "Root culture"],
+            ["Nuclear hybrids", "Hybrid plants derived from cross pollination", "Cytoplasmic hybrids", "Cytological hybrids"],
+            ["-140°C", "-196°C", "-120°C", "-180°C"],
+            ["Embryo culture", "Meristem culture", "Ovule culture", "Anther culture"],
+            ["Decaying cells", "Differentiated cells", "Sterile mass cells", "Undifferentiated mass of cells"],
+            ["Liquid culture", "Micro propagation", "Agar culture", "Suspension culture"],
+            ["Annealing", "Renaturation", "Denaturation", "None of the above"],
+            ["Gene segment", "DNA fragment", "DNA insert", "All of these"],
+            ["Somatic embryogenesis", "Direct organogenesis", "Indirect organogenesis", "Adventitious organogenesis"],
+            ["Root tips", "Leaf disc", "Anther", "Immature zygotic"],
+            ["Kary Mullis", "Boyer", "Sanger", "Cohn"],
+            ["Brinjal", "Tobacco", "Rice", "Cotton"],
+            ["Biolistics", "Electroporation", "Microinjection", "Protoplast fusion"],
+            ["5-10 kb", "10-20 kb", "15-30 kb", "25-30 kb"],
+            ["Sticky ends", "Molecular scissors", "Vectors", "Ligases"],
+            ["Gregor Mendel", "Robert Hooke", "Hermann Staudinger", "Haberlandt"],
+            ["Totipotency", "Plasticity", "Polymorphism", "Mutagenesis"],
+            ["Thermus aquaticus", "Thiobacillus ferrooxidans", "Bacillus subtilis", "Pseudomonas spp."],
+            ["Ethidium bromide", "Bromophenol blue", "Acetocarmine", "Aniline blue"],
+            ["Codominant marker", "Dominant marker", "Multiallelic marker", "All of the above"],
+            ["Electrofusion", "Electro fission", "Electrolysis", "Electroporation"],
+            ["Gram negative bacteria", "Gram positive bacteria", "Gram neutral bacteria", "None of the above"],
+            ["Cellulases", "Pectinases", "Both cellulase and pectinase", "Proteases"],
+            ["Artificially synthesized seeds", "Somatic embryos encapsulated in suitable matrix", "Seeds of plants modified genetically", "None of these"],
+            ["Agar", "EDTA", "Cobaltous chloride", "Nicotinic acid"],
+            ["Uniformity of DNA sequences", "Variations in DNA sequences", "Length of DNA sequence", "Process of DNA replication"],
+            ["High genetic variability", "Risk of contamination", "Increased plant size", "Reduced plant growth rate"],
+            ["Gene transfer", "Anther culture", "Cryopreservation", "Hybridization"],
+            ["To cut DNA at specific sites", "To join DNA fragments together", "To amplify DNA", "To clone genes"],
+            ["Agrobacterium - mediated transformation", "Gene gun", "Electroporation", "Gel electrophoresis"],
+            ["To sterilize media and instruments", "To enhance plant growth", "To induce mutation", "To prevent plant diseases"],
+            ["RFLP", "SNP", "SSR", "RAPD"],
+            ["Biosafety", "Bioinformatics", "Genetic Engineering", "DNA sequencing"],
+            ["Culture of individual cells", "Culture of whole plants", "Culture of intact organs", "Culture of plant roots"],
+            ["Transcription", "Transduction", "Transformation", "Translation"],
+            ["Vector", "Substrate", "Enzyme", "Gene marker"],
+            ["Haploid plants", "Triploid plants", "Tetraploid plants", "All of the above"],
+            ["Sucrose", "Acetosyringone", "Glucose", "Nitrate"],
+            ["They are used to measure expression of genes.", "They are specific DNA regions associated with complex traits.", "They identify exact sequence of a gene.", "They are used only in animal breeding."],
+            ["Development of hybrids", "Production of polyploids", "Induction of somatic mutations", "Creation of homozygous lines"],
+            ["Environmental protection", "Industrial processes", "Agricultural improvement", "Medical applications"],
+            ["Protoplast fusion", "Embryo rescue", "Callus culture", "Anther culture"],
+            ["Monocots", "Dicots", "Gymnosperms", "Algae"],
+            ["ICAR", "DBT", "GEAC", "FSSAI"],
+            ["SSR", "SNP", "ISSR", "EST"],
+            ["55°C", "72°C", "95°C", "37°C"],
+            ["Constant nutrient supply", "Fixed initial volume of medium with no further addition", "Continuous harvesting of cells", "Steady-state cell growth."],
+            ["DNA fingerprinting", "Protein synthesis", "Antibiotic resistance", "Gene cloning"],
+            ["Ethanol", "Methanol", "Glycerol", "Acetone"],
+            ["T-DNA", "M-DNA", "Z-DNA", "R-DNA"],
+            ["Mustard", "Cotton", "Rice", "Sunflower"],
+            ["It enhance photosynthesis", "It provides resistance against insect pests", "It improves water absorption", "It increases fruit size"],
+            ["Inoculation", "Hardening", "Fermentation", "Germination"],
+            ["To bind primers to DNA", "To separate DNA strands", "To extend DNA strands", "To cool reaction mixture"],
+            ["SDS-PAGE", "Gel Electrophoresis", "PCR", "ELISA"],
+            ["To help in identifying transformed cells", "To clone genes", "To purify proteins", "To sequence DNA"],
+            ["Western blotting", "Southern blotting", "Northern blotting", "Eastern blotting"],
+            ["Origin of replication", "Antibiotic resistance gene", "Insertion site for gene of interest", "All of the above"],
+            ["Green biotechnology", "Red biotechnology", "White biotechnology", "Blue biotechnology"],
+            ["The effectiveness of biological drugs", "The protection of living organism from biological hazards", "Safety of laboratory equipment", "The economic impact of biotechnology"],
+            ["To promote shoot development", "To inhibit root growth", "To reduce plant size", "To enhance disease of resistance"]
+        ];
+
+        const answers = [0, 1, 0, 2, 3, 2, 0, 0, 0, 2, 0, 0, 1, 0, 2, 2, 1, 1, 3, 0, 3, 3, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 3, 0, 2, 2, 3, 2, 1, 1, 2, 2, 1, 0, 3, 0, 0, 1, 0, 0, 0, 1, 3, 1, 1, 0, 1, 1, 2, 1, 1, 1, 2, 0, 0, 1, 2, 0, 3, 0, 0, 2, 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2];
+
+        function buildQuiz() {
+            const form = document.getElementById('quizForm');
+            for (let i = 0; i < questions.length; i++) {
+                const div = document.createElement('div');
+                div.className = 'question';
+                
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>Question ${i + 1}:</strong> ${questions[i]}`;
+                div.appendChild(p);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                for (let j = 0; j < options[i].length; j++) {
+                    const label = document.createElement('label');
+
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = 'q' + i;
+                    input.value = j;
+
+                    label.appendChild(input);
+                    label.append(` ${options[i][j]}`);
+
+                    optionsDiv.appendChild(label);
+                }
+
+                div.appendChild(optionsDiv);
+                form.appendChild(div);
+            }
+        }
+
+        function saveAnswer(questionIndex, answerValue) {
+            localStorage.setItem('bioQuiz_q' + questionIndex, answerValue);
+        }
+
+        function loadAnswers() {
+            const form = document.getElementById('quizForm');
+            for (let i = 0; i < answers.length; i++) {
+                const saved = localStorage.getItem('bioQuiz_q' + i);
+                if (saved !== null) {
+                    const optionInputs = form['q' + i];
+                    for (const input of optionInputs) {
+                        if (input.value === saved) {
+                            input.checked = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        function attachSaveListeners() {
+            const form = document.getElementById('quizForm');
+            for (let i = 0; i < answers.length; i++) {
+                const optionInputs = form['q' + i];
+                for (const input of optionInputs) {
+                    input.addEventListener('change', function() {
+                        saveAnswer(i, this.value);
+                    });
+                }
+            }
+        }
+
+        function checkAnswers() {
+            const form = document.getElementById('quizForm');
+            let score = 0;
+            let resultsHTML = '<h2>Results:</h2>';
+            for (let i = 0; i < answers.length; i++) {
+                const optionInputs = form['q' + i];
+                let userAnswer = -1;
+                for (const input of optionInputs) {
+                    if (input.checked) {
+                        userAnswer = parseInt(input.value);
+                        break;
+                    }
+                }
+                if (userAnswer === -1) {
+                    resultsHTML += `<p><strong>Question ${i + 1}:</strong> No answer selected.</p>`;
+                    continue;
+                }
+                if (userAnswer === answers[i]) {
+                    score++;
+                    resultsHTML += `<p><strong>Question ${i + 1}:</strong> <span class='correct'>Correct</span></p>`;
+                } else {
+                    resultsHTML += `<p><strong>Question ${i + 1}:</strong> <span class='incorrect'>Incorrect</span></p>`;
+                }
+            }
+            resultsHTML += `<h3>Your score: ${score} / ${answers.length}</h3>`;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = resultsHTML;
+            window.scrollTo(0, resultsDiv.offsetTop);
+        }
+
+        window.onload = function() {
+            buildQuiz();
+            loadAnswers();
+            attachSaveListeners();
+        };
+    </script>
+</body>
+</html>
