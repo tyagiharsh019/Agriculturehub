@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Online Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #chat-messages {
+            scroll-behavior: smooth;
+        }
+        /* Custom scrollbar for better aesthetics */
+        #chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-messages::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        #chat-messages::-webkit-scrollbar-thumb {
+            background-color: #4a5568;
+            border-radius: 10px;
+            border: 2px solid #2d3748;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-white flex items-center justify-center h-screen">
+
+    <div id="loading-spinner" class="flex flex-col items-center justify-center">
+        <svg class="animate-spin -ml-1 mr-3 h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="mt-2 text-lg">Connecting to chat...</p>
+    </div>
+
+    <div id="chat-container" class="hidden flex flex-col w-full max-w-2xl h-[95vh] max-h-[800px] bg-gray-900 rounded-2xl shadow-2xl p-6">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-700">
+             <div>
+                <h1 class="text-2xl font-bold">Global Chat Room</h1>
+                <p class="text-xs text-gray-400">Your User ID (Share with friends): <code id="user-id-display" class="bg-gray-700 px-1 rounded"></code></p>
+             </div>
+            <div class="flex items-center">
+                <input type="text" id="username-input" class="w-40 bg-gray-700 border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 transition" placeholder="Your Username">
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="flex-grow my-4 overflow-y-auto pr-2">
+            <!-- Messages will be dynamically inserted here -->
+        </div>
+
+        <!-- Message Input Form -->
+        <form id="message-form" class="flex items-center space-x-4">
+            <input type="text" id="message-input" class="flex-grow bg-gray-700 border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3" placeholder="Type your message..." autocomplete="off">
+            <button type="submit" class="inline-flex items-center justify-center rounded-lg px-5 py-3 font-medium text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-800 transition">
+                <svg class="w-5 h-5 -ml-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                Send
+            </button>
+        </form>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- DOM Elements ---
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const chatContainer = document.getElementById('chat-container');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const usernameInput = document.getElementById('username-input');
+        const userIdDisplay = document.getElementById('user-id-display');
+        
+        // --- State ---
+        let db;
+        let auth;
+        let currentUserId;
+        let currentUsername;
+
+        const animals = ["Lion", "Tiger", "Bear", "Wolf", "Fox", "Panda", "Eagle", "Shark", "Dolphin"];
+        const adjectives = ["Brave", "Clever", "Swift", "Silent", "Wise", "Witty", "Curious", "Bold"];
+
+        // --- Firebase Initialization ---
+        async function initializeFirebase() {
+            try {
+                // These global variables are provided by the environment.
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-chat-app';
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('Debug');
+
+                // --- Authentication ---
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                        userIdDisplay.textContent = currentUserId;
+
+                        // Start listening for chat messages
+                        listenForMessages(appId);
+                        
+                        // Show chat and hide spinner
+                        loadingSpinner.classList.add('hidden');
+                        chatContainer.classList.remove('hidden');
+                        chatContainer.classList.add('flex');
+                    }
+                });
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // --- Set a random username initially ---
+                const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+                const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+                currentUsername = `${randomAdjective} ${randomAnimal}`;
+                usernameInput.value = currentUsername;
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                loadingSpinner.innerHTML = '<p class="text-red-500">Error connecting to chat service. Please try again later.</p>';
+            }
+        }
+
+        // --- Firestore Real-time Listener ---
+        function listenForMessages(appId) {
+            const messagesCollection = collection(db, `artifacts/${appId}/public/data/messages`);
+            const q = query(messagesCollection); // No orderBy here
+
+            onSnapshot(q, (snapshot) => {
+                let allMessages = [];
+                snapshot.forEach((doc) => {
+                    allMessages.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort messages by timestamp client-side
+                allMessages.sort((a, b) => {
+                    const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                    const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                    return timeA - timeB;
+                });
+                
+                displayMessages(allMessages);
+            }, (error) => {
+                console.error("Error listening to messages: ", error);
+            });
+        }
+
+        // --- Display Messages in UI ---
+        function displayMessages(messages) {
+            chatMessages.innerHTML = ''; // Clear existing messages
+            messages.forEach(msg => {
+                const isCurrentUser = msg.userId === currentUserId;
+                
+                const messageWrapper = document.createElement('div');
+                messageWrapper.classList.add('flex', 'mb-4', isCurrentUser ? 'justify-end' : 'justify-start');
+
+                const messageBubble = document.createElement('div');
+                messageBubble.classList.add('rounded-lg', 'px-4', 'py-2', 'max-w-xs', 'lg:max-w-md');
+                messageBubble.classList.add(isCurrentUser ? 'bg-blue-600' : 'bg-gray-700');
+
+                const usernameEl = document.createElement('p');
+                usernameEl.classList.add('font-bold', 'text-sm', isCurrentUser ? 'text-blue-200' : 'text-gray-300');
+                usernameEl.textContent = isCurrentUser ? 'You' : msg.username;
+                
+                const textEl = document.createElement('p');
+                textEl.classList.add('text-white', 'text-base');
+                textEl.textContent = msg.text;
+
+                messageBubble.appendChild(usernameEl);
+                messageBubble.appendChild(textEl);
+                messageWrapper.appendChild(messageBubble);
+                chatMessages.appendChild(messageWrapper);
+            });
+
+            // Auto-scroll to the bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // --- Handle Sending Messages ---
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageText = messageInput.value.trim();
+
+            if (messageText && currentUserId) {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-chat-app';
+                const messagesCollection = collection(db, `artifacts/${appId}/public/data/messages`);
+                
+                try {
+                    await addDoc(messagesCollection, {
+                        text: messageText,
+                        username: currentUsername,
+                        userId: currentUserId,
+                        timestamp: serverTimestamp()
+                    });
+                    messageInput.value = ''; // Clear input field
+                } catch (error) {
+                    console.error("Error sending message: ", error);
+                }
+            }
+        });
+        
+        // --- Update Username on input change ---
+        usernameInput.addEventListener('change', (e) => {
+            const newUsername = e.target.value.trim();
+            if(newUsername){
+                currentUsername = newUsername;
+            } else {
+                e.target.value = currentUsername; // revert if empty
+            }
+        });
+
+        // --- Start the app ---
+        initializeFirebase();
+
+    </script>
+</body>
+</html>
